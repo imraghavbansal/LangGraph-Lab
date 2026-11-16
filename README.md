@@ -35,7 +35,8 @@ LangGraph-Lab/
 │
 ├── AI Agents/
 │   ├── agent_bot.py
-│   └── memory_agent.py
+│   ├── memory_agent.py
+│   └── ReAct.py
 │
 ├── .gitignore
 └── README.md
@@ -50,6 +51,7 @@ The `Graphs/` directory contains Jupyter Notebook implementations exploring the 
 ### Graph I: Introduction to LangGraph
 
 **Files:**
+
 - `Compliment.ipynb`
 - `Hello_World.ipynb`
 
@@ -58,6 +60,7 @@ Initial implementations exploring basic LangGraph structures and simple graph ex
 ### Graph II: Multiple Operations and Input Handling
 
 **Files:**
+
 - `Multiple_Operation.ipynb`
 - `Sum_Inputs.ipynb`
 
@@ -66,6 +69,7 @@ Exploring how graph workflows handle inputs and execute multiple operations thro
 ### Graph III: Sequential Agent Workflows
 
 **Files:**
+
 - `Sequential_Agent_1.ipynb`
 - `Sequential_Agent_2.ipynb`
 
@@ -74,6 +78,7 @@ Implementing sequential execution patterns where multiple nodes or processing st
 ### Graph IV: Conditional Workflows
 
 **Files:**
+
 - `Conditional_Agent.ipynb`
 - `Multi_Conditional_Agent.ipynb`
 
@@ -82,6 +87,7 @@ Exploring conditional routing and decision-based execution, where the workflow f
 ### Graph V: Loops and Iterative Workflows
 
 **Files:**
+
 - `Auto_High_Low_Game.ipynb`
 - `Looping.ipynb`
 
@@ -192,7 +198,7 @@ Unlike the first agent, which processes each input independently, this implement
         History
            |
            v
-      Next Input
+       Next Input
 ```
 
 **Current capabilities:**
@@ -214,6 +220,101 @@ Unlike the first agent, which processes each input independently, this implement
 
 This implementation introduces the fundamentals of conversational state management and serves as a foundation for exploring persistent memory, checkpointing, and more advanced agent architectures.
 
+### Agent 3: ReAct Agent (Reasoning and Acting)
+
+**File:** `ReAct.py`
+
+Built a ReAct (Reasoning and Acting) agent using LangGraph, LangChain and Ollama.
+
+Unlike the previous agents, this implementation allows the LLM to interact with external tools, decide which operations to perform and use their results to continue processing.
+
+**Model:** Qwen 2.5 1.5B  
+**Inference:** Ollama  
+**LLM Integration:** LangChain ChatOllama
+
+**Implementation details:**
+
+- Defined a custom `AgentState` using Python's `TypedDict` to manage messages.
+- Used `Annotated` with LangGraph's `add_messages` reducer to manage message state updates.
+- Used `BaseMessage` to represent different types of messages in the conversation.
+- Created mathematical tools using LangChain's `@tool` decorator: `add`, `subtract` and `multiply`.
+- Used `bind_tools()` to make the available tools accessible to the LLM.
+- Created a `model_call` node to invoke the LLM with system instructions and conversation messages.
+- Used LangGraph's prebuilt `ToolNode` to execute tool calls requested by the model.
+- Implemented a `should_continue` function to check whether the LLM requested a tool call.
+- Used conditional edges to route execution either to the tools node or `END`.
+- Connected the tools node back to the LLM node, creating a cyclic execution workflow.
+- Used `ToolMessage` to pass tool execution results back to the LLM.
+- Implemented streaming with `stream()` and `stream_mode="values"` to observe graph state updates during execution.
+
+**Workflow:**
+
+```text
+          START
+            |
+            v
+         our_agent
+            |
+            v
+      should_continue
+            |
+       +----+----+
+       |         |
+   Tool Calls   No Tool Calls
+       |         |
+       v         v
+     tools       END
+       |
+       v
+   Tool Results
+       |
+       v
+    our_agent
+       |
+       v
+  Check Again
+```
+
+**Example execution:**
+
+Input:
+
+```text
+Add 4 + 12 and then multiply the result by 4
+and then subtract 64 from that result.
+```
+
+The agent uses its available mathematical tools to perform the operations:
+
+```text
+Addition:       4 + 12 = 16
+Multiplication: 16 * 4 = 64
+Subtraction:    64 - 64 = 0
+```
+
+**Final Result:** `0`
+
+**Current capabilities:**
+
+- Accepts mathematical queries through the graph input.
+- Uses an LLM with access to multiple mathematical tools.
+- Allows the model to decide when tools are required.
+- Executes requested tools through LangGraph's `ToolNode`.
+- Uses conditional routing to determine the next execution step.
+- Supports cyclic execution between the LLM and tool nodes.
+- Passes tool execution results back to the LLM.
+- Streams graph state updates during execution.
+
+**Current limitations:**
+
+- Currently implements only three mathematical tools.
+- Tool selection depends on the language model's tool-calling capabilities.
+- No persistent memory or checkpointing implemented.
+- No human approval mechanism for tool execution.
+- No advanced tool error handling or retry strategy implemented.
+
+This implementation introduces the ReAct architecture and demonstrates how LLMs can interact with external tools through graph-based orchestration.
+
 ---
 
 ## Tech Stack
@@ -225,7 +326,7 @@ This implementation introduces the fundamentals of conversational state manageme
 | LangChain Core | Message abstractions and LLM integration |
 | LangChain Ollama | Integration with locally running language models |
 | Ollama | Local LLM inference |
-| Qwen 2.5 1.5B | Language model used in both agents |
+| Qwen 2.5 1.5B | Language model used across all three agents |
 | Jupyter Notebook | Graph experiments and implementations |
 | python-dotenv | Environment variable loading |
 
@@ -246,6 +347,7 @@ Areas being explored progressively include:
 - Conversation history management
 - Memory and persistence
 - Tool calling and agent interactions
+- ReAct architecture
 - Checkpointing and state recovery
 - Human-in-the-loop workflows
 - Multi-agent architectures
