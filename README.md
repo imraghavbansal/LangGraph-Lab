@@ -4,8 +4,6 @@ A hands-on engineering lab documenting my journey of learning and building state
 
 This repository contains practical implementations, experiments, and progressively advanced concepts, starting with fundamental graph structures and moving towards building AI agents.
 
-The goal is to understand how agentic systems work under the hood by implementing concepts, experimenting with different approaches, and building everything incrementally.
-
 ---
 
 ## Repository Structure
