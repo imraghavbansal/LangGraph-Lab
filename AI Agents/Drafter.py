@@ -1,5 +1,5 @@
 from typing import Annotated, Sequence, TypedDict
-from dotenv import load_dotenv  
+from dotenv import load_dotenv
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, ToolMessage, SystemMessage
 from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
@@ -27,7 +27,7 @@ def update(content: str) -> str:
 @tool
 def save(filename: str) -> str:
     """Save the current document to a text file and finish the process.
-    
+
     Args:
         filename: Name for the text file.
     """
@@ -43,10 +43,10 @@ def save(filename: str) -> str:
             file.write(document_content)
         print(f"\n💾 Document has been saved to: {filename}")
         return f"Document has been saved successfully to '{filename}'."
-    
+
     except Exception as e:
         return f"Error saving document: {str(e)}"
-    
+
 
 tools = [update, save]
 
@@ -55,11 +55,11 @@ model = ChatOllama(model="qwen2.5:1.5b").bind_tools(tools)
 def our_agent(state: AgentState) -> AgentState:
     system_prompt = SystemMessage(content=f"""
     You are Drafter, a helpful writing assistant. You are going to help the user update and modify documents.
-    
+
     - If the user wants to update or modify content, use the 'update' tool with the complete updated content.
     - If the user wants to save and finish, you need to use the 'save' tool.
     - Make sure to always show the current document state after modifications.
-    
+
     The current document content is:{document_content}
     """)
 
@@ -87,25 +87,25 @@ def should_continue(state: AgentState) -> str:
     """Determine if we should continue or end the conversation."""
 
     messages = state["messages"]
-    
+
     if not messages:
         return "continue"
-    
+
     # This looks for the most recent tool message....
     for message in reversed(messages):
         # ... and checks if this is a ToolMessage resulting from save
-        if (isinstance(message, ToolMessage) and 
+        if (isinstance(message, ToolMessage) and
             "saved" in message.content.lower() and
             "document" in message.content.lower()):
             return "end" # goes to the end edge which leads to the endpoint
-        
+
     return "continue"
 
 def print_messages(messages):
     """Function made to print the messages in a more readable format"""
     if not messages:
         return
-    
+
     for message in messages[-3:]:
         if isinstance(message, ToolMessage):
             print(f"\n🛠️ TOOL RESULT: {message.content}")
@@ -134,13 +134,13 @@ app = graph.compile()
 
 def run_document_agent():
     print("\n ===== DRAFTER =====")
-    
+
     state = {"messages": []}
-    
+
     for step in app.stream(state, stream_mode="values"):
         if "messages" in step:
             print_messages(step["messages"])
-    
+
     print("\n ===== DRAFTER FINISHED =====")
 
 if __name__ == "__main__":

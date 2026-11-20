@@ -4,11 +4,8 @@ A hands-on engineering lab documenting my journey of learning and building state
 
 This repository contains practical implementations, experiments and progressively advanced concepts, starting with fundamental graph structures and moving towards building LLM-powered agents capable of maintaining conversational context, using tools and interacting with external systems.
 
-<<<<<<< HEAD
-=======
 The goal is to understand how agentic systems work under the hood by implementing concepts, experimenting with different approaches and building everything incrementally.
 
->>>>>>> 4aef170 (feat(agents): add tool-driven document drafting agent)
 ---
 
 ## Repository Structure
@@ -501,12 +498,8 @@ The repository is organized to maintain a clear progression from fundamental gra
 
 The focus is on understanding the underlying concepts, writing implementations, experimenting with different approaches and maintaining meaningful documentation and Git history.
 
-<<<<<<< HEAD
 ---
-=======
 New experiments, implementations and improvements will be added as the lab evolves.
-
 ---
 
 **Built as a continuous learning and engineering project.**
->>>>>>> 4aef170 (feat(agents): add tool-driven document drafting agent)
